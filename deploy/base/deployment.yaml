@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dotnet-apiserver
+  labels:
+    app: dotnet-apiserver
+    app.kubernetes.io/component: dotnet-apiserver
+    app.kubernetes.io/instance: dotnet-apiserver
+  annotations:
+    # app.openshift.io/connects-to: >-
+    #   [{"apiVersion":"postgresql.cnpg.io/v1","kind":"Cluster","name":"apiserver-dbcluster"}]
+    app.openshift.io/vcs-uri: 'https://github.com/joshgav/dotnet-apiserver'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: dotnet-apiserver
+      app: dotnet-apiserver
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-dotnet: "true"
+      labels:
+        app.kubernetes.io/component: dotnet-apiserver
+        app: dotnet-apiserver
+    spec:
+      containers:
+        - name: dotnet-apiserver
+          image: quay.io/joshgav/dotnet-apiserver:latest
+          imagePullPolicy: Always
+          # envFrom:
+          #   - prefix: PG_
+          #     secretRef:
+          #       name: apiserver-dbcluster-superuser
+          env:
+            - name: ASPNETCORE_HTTP_PORT
+              value: '8080'
+            - name: ASPNETCORE_URLS
+              value: "http://+:8080"
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+            # - name: HOME
+            #   value: /app
+            # - name: PG_host
+            #   value: apiserver-dbcluster-rw
+            # - name: PG_port
+            #   value: '5432'
+            # - name: PG_dbname
+            #   value: postgres
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+              name: http
+          livenessProbe:
+            httpGet:
+              path: "/healthz"
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: "/healthz"
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 10
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
