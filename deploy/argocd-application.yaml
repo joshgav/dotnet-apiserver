@@ -1,0 +1,19 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dotnet-apiserver
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: dotnet-apiserver
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: deploy/base
+    repoURL: https://github.com/joshgav/dotnet-apiserver.git
+    targetRevision: main
+    kustomize: {}
+  syncPolicy:
+    automated: {}
