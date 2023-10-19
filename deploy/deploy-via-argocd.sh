@@ -17,4 +17,5 @@ if [[ $? != 0 ]]; then
 fi
 
 ensure_namespace ${app_namespace}
-kubectl apply --namespace ${argocd_namespace} argocd-application.yaml
+kubectl apply --namespace ${argocd_namespace} -f ${this_dir}/argocd-application.yaml
+
