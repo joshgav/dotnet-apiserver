@@ -16,6 +16,7 @@ if [[ $? != 0 ]]; then
     exit 2
 fi
 
+${this_dir}/create-config.sh
+
 ensure_namespace ${app_namespace}
 kubectl apply --namespace ${argocd_namespace} -f ${this_dir}/argocd-application.yaml
-

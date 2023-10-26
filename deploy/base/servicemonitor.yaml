@@ -5,7 +5,7 @@ metadata:
 spec:
   endpoints:
   - interval: 30s
-    port: 8080-tcp
+    port: 80-tcp
     scheme: http
     path: "/healthz"
   selector:
